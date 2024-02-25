@@ -2,20 +2,25 @@ using WAD._13344.Application;
 using WAD._13344.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
-
 // Add services to the container.
-
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
 // Add services to the container.
 builder.Services.ApplicationServices();
 builder.Services.InfrastructureServices(builder.Configuration);
+builder.Services.AddCors(options =>
+{
+	options.AddPolicy(
+		name: "CorsPolicy",
+		builder => {
+			builder.WithOrigins().AllowAnyOrigin().WithOrigins("http://localhost:4200").AllowAnyMethod().AllowAnyHeader();
+		}
+	);
+});
 
 var app = builder.Build();
-
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -24,9 +29,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.UseCors("CorsPolicy");
 app.UseAuthorization();
-
 app.MapControllers();
-
 app.Run();
